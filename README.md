@@ -1,0 +1,2 @@
+# srfssg
+Shift Schedule Generator
