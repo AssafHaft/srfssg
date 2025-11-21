@@ -28,9 +28,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: 'npm'
+          # Removed 'cache: npm' because it fails if package-lock.json is missing
       - name: Install dependencies
-        run: npm ci
+        # Used 'npm install' instead of 'npm ci' so it generates the lockfile automatically
+        run: npm install
       - name: Build
         run: npm run build
       - name: Upload artifact
