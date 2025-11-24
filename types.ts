@@ -1,3 +1,4 @@
+
 export enum ShiftType {
   DAY = 'DAY',
   NIGHT = 'NIGHT'
@@ -19,7 +20,8 @@ export interface Employee {
   name: string;
   preference: WorkerPreference;
   availability: Availability;
-  color: string; // For UI visualization
+  targetShifts?: number; // Quota
+  color: string;
 }
 
 export interface ShiftConfig {
@@ -27,9 +29,7 @@ export interface ShiftConfig {
   dayEndTime: string;
   nightStartTime: string;
   nightEndTime: string;
-  // New feature flag
   distributeDayShiftsToEither?: boolean;
-  // Maps day of week (0-6) to number of workers needed
   requirements: {
     [key: number]: {
       day: number;
@@ -38,15 +38,18 @@ export interface ShiftConfig {
   };
 }
 
-export interface ShiftAssignment {
-  shiftType: ShiftType;
-  employeeId: string;
-}
-
 export interface DailySchedule {
-  date: string; // ISO date string YYYY-MM-DD
+  date: string; // ISO YYYY-MM-DD
   dayShift: string[]; // Employee IDs
   nightShift: string[]; // Employee IDs
+  isPadding?: boolean; // True if this day is outside the target month (prev/next month padding)
+}
+
+export interface ManualHistoryInput {
+  [dateKey: string]: {
+    dayShift: string[];
+    nightShift: string[];
+  }
 }
 
 export interface ScheduleVersion {
@@ -56,7 +59,7 @@ export interface ScheduleVersion {
   month: number; // 0-11
   year: number;
   schedule: DailySchedule[];
-  stats: Record<string, EmployeeStats>; // EmployeeId -> Stats
+  stats: Record<string, EmployeeStats>;
 }
 
 export interface EmployeeStats {
@@ -67,13 +70,9 @@ export interface EmployeeStats {
 }
 
 export interface HistoricalContext {
-  // ID of employees who worked the Night shift on the very last day of the previous month
   lastDayNightShiftIds: string[];
-  // Stats carried over (Employee ID -> counts)
   accumulatedStats: Record<string, { day: number, night: number, total: number }>;
-  // Consecutive days worked leading up to the end of the previous month (Employee ID -> count)
   consecutiveDaysEnding: Record<string, number>;
-  // Name of the file or context
   sourceName: string;
 }
 
